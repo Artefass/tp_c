@@ -1,12 +1,16 @@
 #include "token.h"
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include <assert.h>
 
-#define PTRN_STRING "^\"\d\""
-#define PTRN_NUMBER "^\d"
+#include"utils.h"
+
+#define PTRN_STRING "^\"[0-9a-zA-Z]+\""
+#define PTRN_NUMBER "^[0-9]+"
 #define PTRN_OPERATION "^(*|+|-|(|))"
 
 typedef struct regex_token_t {
@@ -113,7 +117,7 @@ static bool match_token(const char *str, token_t *token)
     return false;
 }
 
-token_t *get_token(const char *str)
+static token_t *get_token(const char *str)
 {
     // пропуск пробелов
     while(*str == ' ' && *str != '\0') str++;
@@ -125,9 +129,67 @@ token_t *get_token(const char *str)
     }
 
     if (!match_token(str, token)){
-        free_token(&token);
+        free_token(token);
         return NULL;
     }
     
     return token;
 }
+
+#define BASE_SIZE 16
+
+static token_t** new_tokens_massive()
+{
+    token_t **tokens = calloc(sizeof(token_t*), BASE_SIZE);
+    if (!tokens) {
+        return NULL;
+    }
+
+    tokens[0] = NULL;
+    return tokens;
+}
+
+void free_tokens(token_t *tokens[])
+{
+    if (tokens)
+    {
+        for (token_t **ptoken = tokens; *ptoken != NULL; ptoken++)
+        {
+            free_token(*ptoken);
+        }
+        free(tokens);
+    }
+}
+
+token_t** parse_to_tokens(const char *str)
+{
+    if (regex_init())
+    {
+        return NULL;
+    }
+
+    token_t **tokens = NULL;
+    if (!(tokens = new_tokens_massive()))
+    {
+        printf("ERROR: parse_to_tokens. Could not allocate memmory for tokens\n");
+        regex_free();
+        return NULL;
+    }
+
+    token_t *token = NULL;
+    while ((token = get_token(str)))
+    {
+        massive_add_back(tokens, token);
+    }
+
+    if (str != '\0')
+    {
+        printf("ERROR: parse_to_tokens. Invalid literal %s\n", str);
+        free_tokens(tokens);
+        regex_free();
+        return NULL;
+    }
+
+    regex_free();
+    return tokens;
+} 

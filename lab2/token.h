@@ -16,4 +16,5 @@ typedef struct token_t {
     char *value;
 } token_t;
 
-token_t *get_token(const char *str);
+token_t** parse_to_tokens(const char *str);
+void free_tokens(token_t *tokens[]);
