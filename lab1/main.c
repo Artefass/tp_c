@@ -1,7 +1,10 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 void free_nstrings(char **strings, int size)
 {
@@ -16,12 +19,13 @@ void free_nstrings(char **strings, int size)
 
 void free_strings(char **strings)
 {
-    asser(strings);
+    assert(strings);
 
     char **pstr = strings;
     while (*pstr != NULL)
     {
         free(*pstr);
+        pstr++;
     }
 
     free(strings); 
@@ -35,12 +39,24 @@ void print_strings(char **strings)
     while (*pstr != NULL)
     {
         printf("%s\n", *pstr);
+        pstr++;
+    }
+}
+
+void print_nstrings(char **strings, int size)
+{
+    assert(strings);
+
+    for (int i = 0; i < size; i++)
+    {
+        printf("%s\n", strings[i]);
     }
 }
 
 bool is_description(char *str)
 {
-    assert(str);
+    assert(str != NULL);
+
     int len = strlen(str);
 
     if (strlen("Date:") <= len && !strncmp(str, "Date:", strlen("Date:")))
@@ -65,6 +81,8 @@ bool is_description(char *str)
 
 char** find_descriptions(char **lines, int nlines)
 {
+    assert(lines);
+
     char **descriptions = calloc(sizeof(char*), nlines + 1);
     int ndes = 0;
 
@@ -99,6 +117,8 @@ char** find_descriptions(char **lines, int nlines)
 char* get_line()
 {
     int line_size = 32;
+
+    // выделяем память под струку
     char *line  = malloc(sizeof(char) * line_size);
     if (!line)
     {
@@ -107,6 +127,8 @@ char* get_line()
 
     int i = 0;
     char c;
+    // считываем по одному символу, пока не встретим перевод строки
+    // или пустой ввод
     while ((c = getchar()) != '\n' && c != EOF)
     {
         if (line_size <= i + 1) // хватит ли у нас памяти под следующие символы
@@ -131,7 +153,9 @@ char* get_line()
 
     if (i == 0) // если ничего не ввели или ввели два раза символ перевода строки
     {
-        retrun NULL;
+        // обязательно освобождаем строку
+        free(line);
+        return NULL;
     }
 
     line[i] = '\0';
@@ -140,14 +164,17 @@ char* get_line()
 
 int read_lines(char **lines, int size)
 {
-    char **pstr = lines;
+    assert(lines && size > 0);
 
     int curr_size = size;
+    
     int nlines = 0;
-    while((*pstr = get_line()))
+    while((lines[nlines] = get_line()))
     {
+        // если мы заполнили массив строк
         if (curr_size - 1 == nlines)
         {
+            // то увеличиваем размер массива строк в 2 раза
             char **tmp_lines = realloc(lines, sizeof(char*) * curr_size * 2);
             if (!tmp_lines)
             {
@@ -155,7 +182,7 @@ int read_lines(char **lines, int size)
                 {
                     free(lines[i]);
                 }
-                return 0;pdes
+                return 0;
             }
 
             lines = tmp_lines;
@@ -180,15 +207,15 @@ int main(int argc, char *argv[])
 
     if (!(nlines = read_lines(lines, nlines)))
     {
-        printf("[error]");
-        free_vector(lines);
+        free(lines);
+        return 0;
     }
 
     char **descriptions = find_descriptions(lines, nlines);
     if (!descriptions)
     {
         printf("[error]");
-        free_vector(lines);
+        free_nstrings(lines, nlines);
         return 0;
     }
 
