@@ -1,6 +1,5 @@
 CFALGS = -std=c99 -Wall -Werror
 
-TESTFLAGS = -lcheck -lm -lpthread -lrt -lsubunit
 VALGRINDPARAMS = --leak-check=full --undef-value-errors=yes
 VALGRINDFLAGS  =  -g -O0
 
