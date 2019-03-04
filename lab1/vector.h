@@ -28,6 +28,7 @@ typedef struct vector_t {
     void *data;
 } vector_t;
 
+void print_vector(vector_t *vector);
 
 vector_t* new_vector(int data_size, int capacity);
 void free_vector(vector_t *vector);

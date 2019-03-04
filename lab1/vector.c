@@ -7,6 +7,35 @@
 #include <assert.h>
 #include <string.h>
 
+
+void print_vector(vector_t *vector)
+{
+    assert(vector);
+
+    printf("\n Vector data:");
+    for (int i = 0; i < vector->size; i++)
+    {
+        void *data;
+        
+        switch (vector->data_size)
+        {
+            case sizeof(int):
+                data = vector->data;
+                printf("%d ", ((int*)data)[i]);
+                break;
+            case sizeof(char):
+                data = vector->data;
+                printf("%c", ((char*)data)[i]);
+                break;
+            default:
+                break;
+        }
+        
+    }
+    printf("\n");
+}
+
+
 vector_t* new_vector(int data_size, int capacity)
 {
     assert(data_size > 0 && capacity > 0);
@@ -62,7 +91,7 @@ static bool realloc_vector(vector_t *vector, int size)
         new_capacity *= 2;
     }
 
-    void *data = realloc(vector->data, new_capacity);
+    void *data = realloc(vector->data, new_capacity * vector->data_size);
     if (!data)
     {
 
@@ -163,7 +192,7 @@ bool vector_delete_at(vector_t *vector, int pos)
         int tail_count = vector->size - pos - 1;
         if (!memcpy(vector->data + vector->data_size * pos, 
             vector->data + vector->data_size * (pos+1),
-            tail_count))
+            tail_count * vector->data_size))
         {
             printf("ERROR: vector_delete_at. Could not copy data\n");
             return false;
