@@ -20,9 +20,4 @@
 
 | Input | Output |
 | --- | --- |
-| From | admin |
-| Subject | hi |
-| Sender | admin |
-| From | admin |
-| Subject | hi |
-
+| From: admin <br> Subject: hi <br> Sender: admin |From: admin <br> Subject: hi |
