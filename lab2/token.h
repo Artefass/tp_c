@@ -1,8 +1,5 @@
 #pragma once
 
-#include <regex.h>
-#include <stdbool.h>
-
 typedef enum {
     UNKNOWN,
     STRING,

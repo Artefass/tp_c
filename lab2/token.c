@@ -161,14 +161,14 @@ void free_tokens(token_t *tokens[])
     }
 }
 
-token_t** parse_to_tokens(const char *str)
+vector* parse_to_tokens(const char *str)
 {
     if (regex_init())
     {
         return NULL;
     }
 
-    token_t **tokens = NULL;
+    vector **tokens = NULL;
     if (!(tokens = new_tokens_massive()))
     {
         printf("ERROR: parse_to_tokens. Could not allocate memmory for tokens\n");
