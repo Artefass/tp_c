@@ -36,3 +36,4 @@ bool vector_push_back(vector_t *vector, void *data);
 bool vector_copy_back(vector_t *vector, void *data, int size);
 bool vector_insert_at(vector_t *vector, void *data, int pos);
 bool vector_delete_at(vector_t *vector, int pos);
+void vector_clean(vector_t *vector);

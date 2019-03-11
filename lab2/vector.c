@@ -203,4 +203,16 @@ bool vector_delete_at(vector_t *vector, int pos)
     return true;
 }
 
+void vector_clean(vector_t *vector)
+{
+    assert(vector);
 
+    vector->size = 0;
+}
+
+void* vector_get(vector_t *vector, int position)
+{
+    assert(vector && 0 <= position && position < vector->size);
+
+    return vector->data + vector->data_size * position;
+}
