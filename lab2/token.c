@@ -217,10 +217,82 @@ token_t* get_token(const char *str, int *error)
     return token;
 }
 
+// непротестированные функции 
+
+#define BASE_SIZE 16
+
+vector_t* new_tokens_vector()
+{
+    vector_t *tokens = new_vector(sizeof(token_t*), BASE_SIZE);
+    if (!tokens) {
+        return NULL;
+    }
+
+    return tokens;
+}
+
+void free_tokens_vector(vector_t* tokens)
+{
+    if (tokens)
+    {
+        for (int i = 0; i < tokens->size; i++)
+        {
+            free_token(((token_t**)tokens->data)[i]);
+        }
+
+        free_vector(tokens);
+    }
+}
 
 
+vector_t* parse_to_tokens(const char *str)
+{
+    vector_t *tokens = NULL;
+    if (!(tokens = new_tokens_vector()))
+    {
+        printf("ERROR: parse_to_tokens. Could not allocate memmory for tokens\n");
+        return NULL;
+    }
 
+    token_t *token = NULL;
+    int errflag;
+    while ((token = get_token(str, &errflag)) && errflag == SUCCESS)
+    {
+        if(!vector_push_back(tokens, token))
+        {
+            printf("ERROR: parse_to_tokens. Could not insert token");
+            free_token(token);
+            free_tokens_vector(tokens);
+            return NULL;
+        }
+    }
 
+    // обработка последней итерации цикла
+    switch (errflag)
+    {
+        // процес "токенизации" строки прошел успешно, достили конца строки
+        case SUCCESS:
+            return tokens;
+
+        // найден неизвестный токен, прерываем работу функции.    
+        case NOT_MATCH:
+            printf("ERROR: parse_to_tokens. Invalid token <%s>\n", &str[token->position]);
+            free_token(token);
+            free_tokens_vector(tokens);
+            return NULL;
+
+        // ошибка выделения памяти - не сработал malloc или calloc
+        case MEMERR:
+            free_token(token);
+            free_tokens_vector(tokens);
+            return NULL;
+        default:
+            printf("Error: parse_to_token. Undefine state flag %d", errflag);
+            free_token(token);
+            free_tokens_vector(tokens);
+            return NULL;
+    }
+}
 
 /*
 

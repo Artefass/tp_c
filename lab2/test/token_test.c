@@ -264,6 +264,47 @@ START_TEST(test_get_token_success)
 }
 END_TEST
 
+START_TEST(test_get_token_failed_at_start)
+{
+    char string[] = " \"123* 2";
+    int error = 0;
+
+    token_t *token = get_token(string, &error);
+    ck_assert(token);
+    ck_assert_int_eq(UNKNOWN, token->type);
+    ck_assert_int_eq(1, token->position);
+    ck_assert_int_eq(1, error);
+    free_token(token);
+}
+END_TEST
+
+
+START_TEST(test_get_token_success_with_different_strings)
+{
+    char string_1[] = " \"123\"* 2";
+    char string_2[] = " 2* \"123\" ";
+    char exc_string_1[] = "123";
+    char exc_string_2[] = "2";
+    int error = 0;
+
+    token_t *token = get_token(string_1, &error);
+    ck_assert(token);
+    ck_assert_int_eq(STRING, token->type);
+    ck_assert_int_eq(1, token->position);
+    ck_assert_str_eq(exc_string_1, token->value);
+    ck_assert_int_eq(0, error);
+    free_token(token);
+
+    token = get_token(string_2, &error);
+    ck_assert(token);
+    ck_assert_int_eq(NUMBER, token->type);
+    ck_assert_int_eq(1, token->position);
+    ck_assert_str_eq(exc_string_2, token->value);
+    ck_assert_int_eq(0, error);
+    free_token(token);
+}
+END_TEST
+
 
 Suite *token_suite(void)
 {
@@ -291,6 +332,8 @@ Suite *token_suite(void)
     tcase_add_test(tc_token_func, test_match_token_success_operation);
     tcase_add_test(tc_token_func, test_match_token_failed);
     tcase_add_test(tc_token_func, test_get_token_success);
+    tcase_add_test(tc_token_func, test_get_token_failed_at_start);
+    tcase_add_test(tc_token_func, test_get_token_success_with_different_strings);
 
 
     //tcase_add_test(tc_core, );

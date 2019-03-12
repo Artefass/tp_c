@@ -19,7 +19,7 @@ TARGET=main
 
 clean:
 	rm -f *.o $(TARGET) *.out
-	rm -rf /test/*.o /test/tests 
+	rm -rf ./test/*.o ./test/tests 
 
 all: $(TARGET)
 
