@@ -28,7 +28,8 @@ typedef struct vector_t {
     void *data;
 } vector_t;
 
-void print_vector(vector_t *vector);
+void print_vector(vector_t *vector, void(*print_elm)(const void*));
+bool vector_eq(vector_t *v1, vector_t *v2, bool (*comp)(const void*, const void*));
 
 vector_t* new_vector(int data_size, int capacity);
 void free_vector(vector_t *vector);

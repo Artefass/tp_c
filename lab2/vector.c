@@ -8,31 +8,43 @@
 #include <string.h>
 
 
-void print_vector(vector_t *vector)
+void print_vector(vector_t *vector, void(*print_elm)(const void*))
 {
     assert(vector);
 
-    printf("\n Vector data:");
     for (int i = 0; i < vector->size; i++)
     {
-        void *data;
-        
-        switch (vector->data_size)
-        {
-            case sizeof(int):
-                data = vector->data;
-                printf("%d ", ((int*)data)[i]);
-                break;
-            case sizeof(char):
-                data = vector->data;
-                printf("%c", ((char*)data)[i]);
-                break;
-            default:
-                break;
-        }
-        
+        (*print_elm)(vector->data + vector->data_size*i);
     }
-    printf("\n");
+}
+
+bool vector_eq(vector_t *v1, vector_t *v2, bool (*comp)(const void*, const void*))
+{
+    assert(v1 && v2 && v1->data_size == v2->data_size);
+
+    if (v1->size != v2->size) return false;
+
+    // если функция сравнения элементов передана
+    if (comp)
+    {
+        for (int i = 0; i < v1->size; i++)
+        {
+            if (!(*comp)(v1->data + v1->data_size*i, v2->data + v2->data_size*i))
+            {
+                return false;
+            }    
+        }
+
+        return true;    
+    // иначе просто сравниваем память    
+    } else {
+        if(!memcmp(v1->data, v2->data, v1->data_size * v1->size))
+        {
+            return true;
+        }
+
+        return false;    
+    }
 }
 
 

@@ -43,6 +43,18 @@ void free_token(token_t *token)
     free(token);
 }
 
+token_t* init_token(token_t *token, token_type type, char *data, int len, int pos)
+{
+    assert(token);
+
+    token->type = type;
+    token->value = strndup(data,len+1);
+    if (!token->value) return NULL;
+    token->position = pos;
+    
+    return token;
+}
+
 int match_string(const char **str, token_t *token)
 {
     assert(str && token);
@@ -286,11 +298,27 @@ vector_t* parse_to_tokens(const char *str)
             free_token(token);
             free_tokens_vector(tokens);
             return NULL;
+        // функция get_token() вернула неизвестный флаг, что-то пропустил 
         default:
             printf("Error: parse_to_token. Undefine state flag %d", errflag);
             free_token(token);
             free_tokens_vector(tokens);
             return NULL;
+    }
+}
+
+void print_tokens(vector_t *tokens)
+{
+    assert(tokens);
+    
+    for (int i = 0; i < tokens->size; i++)
+    {
+        token_t *token = ((token_t**)tokens->data)[i];
+        printf("Token #%d:\n", i);
+        printf("\tname: %s\n", token->name);
+        printf("\ttype: %d\n", token->type);
+        printf("\tposition: %d\n", token->position);
+        printf("\tvalue: %s\n", token->value);
     }
 }
 
@@ -435,18 +463,5 @@ vector_t* parse_to_tokens(const char *str)
     return tokens;
 }
 
-void print_tokens(vector_t *tokens)
-{
-    assert(tokens);
-    
-    for (int i = 0; i < tokens->size; i++)
-    {
-        token_t *token = ((token_t**)tokens->data)[i];
-        printf("Token #%d:\n", i);
-        printf("\tname: %s\n", token->name);
-        printf("\ttype: %d\n", token->type);
-        printf("\tposition: %d\n", token->position);
-        printf("\tvalue: %s\n", token->value);
-    }
-}
+
 */

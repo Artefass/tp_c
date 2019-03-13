@@ -171,6 +171,64 @@ START_TEST(test_vector_delete_at)
 }
 END_TEST
 
+START_TEST(test_vector_eq_success_on_int)
+{
+    int test_data_int[] = {1,2,3,4,5}; int size = 5;
+
+    vector_t *test_v1 = NULL;
+    vector_t *test_v2 = NULL;
+
+    ck_assert((test_v1 = new_vector(sizeof(int), size)));
+    ck_assert((test_v2 = new_vector(sizeof(int), size)));
+
+    for (int i = 0; i < size; i++)
+    {
+        vector_push_back(test_v1, &test_data_int[i]);
+        vector_push_back(test_v2, &test_data_int[i]);
+    }
+
+    ck_assert(!memcmp(test_v1->data, test_data_int, test_v1->data_size * test_v1->size));
+    ck_assert(!memcmp(test_v2->data, test_data_int, test_v2->data_size * test_v2->size));
+    ck_assert(vector_eq(test_v1, test_v2, NULL));
+
+    free_vector(test_v1);
+    free_vector(test_v2);
+}
+END_TEST
+
+bool int_eq(const void *element_1, const void *element_2)
+{
+    int *elm1 = (int*) element_1;
+    int *elm2 = (int*) element_2;
+
+    return !!(*elm1 == *elm2);
+}
+
+START_TEST(test_vector_eq_success_on_int_with_function)
+{
+    int test_data_int[] = {1,2,3,4,5}; int size = 5;
+
+    vector_t *test_v1 = NULL;
+    vector_t *test_v2 = NULL;
+
+    ck_assert((test_v1 = new_vector(sizeof(int), size)));
+    ck_assert((test_v2 = new_vector(sizeof(int), size)));
+
+    for (int i = 0; i < size; i++)
+    {
+        vector_push_back(test_v1, &test_data_int[i]);
+        vector_push_back(test_v2, &test_data_int[i]);
+    }
+
+    ck_assert(!memcmp(test_v1->data, test_data_int, test_v1->data_size * test_v1->size));
+    ck_assert(!memcmp(test_v2->data, test_data_int, test_v2->data_size * test_v2->size));
+    ck_assert(vector_eq(test_v1, test_v2, int_eq));
+
+    free_vector(test_v1);
+    free_vector(test_v2);
+}
+END_TEST
+
 
 Suite *vector_suite(void)
 {
@@ -187,6 +245,8 @@ Suite *vector_suite(void)
     tcase_add_test(tc_core, test_vector_copy_back);
     tcase_add_test(tc_core, test_vector_insert_at);
     tcase_add_test(tc_core, test_vector_delete_at);
+    tcase_add_test(tc_core, test_vector_eq_success_on_int);
+    tcase_add_test(tc_core, test_vector_eq_success_on_int_with_function);
     suite_add_tcase(s, tc_core);
 
     return s;

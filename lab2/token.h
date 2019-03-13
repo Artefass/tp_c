@@ -26,7 +26,7 @@ typedef struct regex_token_t {
     regex_t re;
 } regex_token_t;
 
-
+token_t* init_token(token_t *token, token_type type, char *data, int len, int pos);
 token_t* new_token();
 void free_token(token_t *token);
 
@@ -36,6 +36,13 @@ int match_operation(const char **str, token_t *token);
 int match_token(const char **str, token_t *token);
 
 token_t* get_token(const char *str, int *error);
+
+vector_t* new_tokens_vector();
+void free_tokens_vector(vector_t* tokens);
+
+vector_t* parse_to_tokens(const char *str);
+
+void print_tokens(vector_t *tokens);
 
 /*
 vector_t* parse_to_tokens(const char *str);
